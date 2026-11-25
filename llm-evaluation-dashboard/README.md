@@ -93,13 +93,6 @@ v2        0.500    0.782
 
 Your numbers will be different: model output varies between runs, and latency depends on your hardware.
 
-## Changes from the original tutorial
-
-- **The dashboard reads saved results.** In the tutorial, `app.py` runs the whole evaluation at the top of the script. Streamlit reruns the script on every interaction, so each click would call the model 8 times. Here, `evaluate.py` does the work and `app.py` reads the CSV.
-- **The model is warmed up before timing.** The first call to Ollama includes loading the model into memory (about 7s for `mistral` in testing). Without a warm-up call, that load time is counted against v1's first question and makes v1 look much slower.
-- **The model is configurable** with `OLLAMA_MODEL`.
-- **The results include the question and the answer**, so you can see why a score is high or low.
-
 ## Known limitations
 
 This is a learning scaffold, not a production evaluation suite.
