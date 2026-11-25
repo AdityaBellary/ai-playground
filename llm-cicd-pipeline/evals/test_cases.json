@@ -1,0 +1,22 @@
+[
+  {
+    "input": "Explain machine learning in one sentence.",
+    "expected_keyword": "data"
+  },
+  {
+    "input": "What is Python?",
+    "expected_keyword": "programming"
+  },
+  {
+    "input": "What does CPU stand for?",
+    "expected_keyword": "processing"
+  },
+  {
+    "input": "What is the capital of France? Answer in one word.",
+    "expected_keyword": "paris"
+  },
+  {
+    "input": "Name the language used to style web pages, alongside HTML.",
+    "expected_keyword": "css"
+  }
+]

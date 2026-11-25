@@ -1,0 +1,82 @@
+name: LLM Application CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "llm-cicd-pipeline/**"
+      - ".github/workflows/llm-cicd-pipeline.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "llm-cicd-pipeline/**"
+      - ".github/workflows/llm-cicd-pipeline.yml"
+
+# The app lives in a subfolder of this repo
+defaults:
+  run:
+    working-directory: llm-cicd-pipeline
+
+env:
+  # A small model keeps CI fast; use the full qwen3 locally
+  MODEL_NAME: qwen3:0.6b
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: llm-cicd-pipeline/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: pytest tests/test_unit.py
+
+  evaluate:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: llm-cicd-pipeline/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+
+      - name: Pull model
+        run: ollama pull "$MODEL_NAME"
+
+      - name: Run integration tests
+        run: pytest tests/test_integration.py
+
+      - name: Run LLM evaluations
+        run: python evals/run_evals.py
+
+  build:
+    needs: evaluate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Tag with the commit SHA so every image traces back to its code
+      - name: Build Docker image
+        run: docker build -t llm-app:${{ github.sha }} .
