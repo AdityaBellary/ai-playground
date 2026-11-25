@@ -22,3 +22,4 @@ build/
 
 # ML artifacts
 self-training-model/model/
+llm-evaluation-dashboard/*.csv
